@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>엔비디아 (NVDA) 최근 1개월 주식 대시보드</title>
+  <style>
+    :root {
+      --bg-canvas: #f2f4f7;
+      --card-bg: #ffffff;
+      --card-border: #e5e8eb;
+      --kakao-yellow: #fee500;
+      --kakao-yellow-soft: #fffbe6;
+      --kakao-yellow-border: #f5df4d;
+      --kakao-brown: #3c1e1e;
+      --text-main: #191919;
+      --text-sub: #4e5968;
+      --text-muted: #8b95a1;
+      --danger: #e11d48;
+      --success: #059669;
+      --fact-bg: #eff6ff;
+      --fact-text: #1d4ed8;
+      --fact-border: #bfdbfe;
+      --ai-bg: #fff9db;
+      --ai-text: #7c4a03;
+      --ai-border: #fde047;
+      --unverified-bg: #fff7ed;
+      --unverified-text: #c2410c;
+      --unverified-border: #fed7aa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      padding: 20px 16px 40px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* 카카오톡 상단 공지 바 느낌의 안내 배너 */
+    .disclaimer-banner {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-left: 5px solid var(--kakao-yellow);
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size: 0.88rem;
+      color: var(--text-sub);
+      box-shadow: 0 2px 8px rgba(25, 25, 25, 0.04);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .disclaimer-icon {
+      background: var(--kakao-yellow);
+      color: var(--kakao-brown);
+      font-weight: 800;
+      font-size: 0.78rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+    .disclaimer-banner strong {
+      color: var(--text-main);
+    }
+
+    /* 기본 카드 */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(25, 25, 25, 0.04);
+    }
+
+    .card h2 {
+      font-size: 1.22rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .section-desc {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    /* 헤더 카드 */
+    .header-card {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      background: linear-gradient(135deg, #ffffff 0%, #fffdf0 100%);
+      border: 1px solid #f0e6a2;
+    }
+
+    .title-group h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-main);
+    }
+    .title-group .ticker {
+      font-size: 0.9rem;
+      background: var(--kakao-yellow);
+      color: var(--kakao-brown);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .sub-meta {
+      font-size: 0.84rem;
+      color: var(--text-sub);
+      margin-top: 8px;
+    }
+    .sub-meta strong {
+      color: var(--text-main);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .print-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--kakao-yellow);
+      color: var(--kakao-brown);
+      border: 1px solid var(--kakao-yellow-border);
+      border-radius: 12px;
+      padding: 9px 16px;
+      font-size: 0.86rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(60, 30, 30, 0.08);
+      transition: transform 0.12s ease, background-color 0.12s ease;
+    }
+    .print-btn:hover {
+      background: #fada0a;
+      transform: translateY(-1px);
+    }
+
+    .badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .badge-fact { background: var(--fact-bg); color: var(--fact-text); border: 1px solid var(--fact-border); }
+    .badge-ai { background: var(--ai-bg); color: var(--ai-text); border: 1px solid var(--ai-border); }
+    .badge-unverified { background: var(--unverified-bg); color: var(--unverified-text); border: 1px solid var(--unverified-border); }
+    .badge-read { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+
+    /* 핵심 지표 4개 그리드 */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .metric-item {
+      background: #f8f9fb;
+      border: 1px solid #edf0f4;
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .metric-value {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+    .metric-change {
+      font-size: 0.83rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .text-down { color: var(--danger); }
+    .text-up { color: var(--success); }
+
+    /* 사실 vs 해석 말풍선 스타일 2열 비교 */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .compare-col {
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .compare-col.fact-col {
+      background: #f7faff;
+      border: 1px solid #dbeafe;
+      border-top-left-radius: 6px;
+    }
+    .compare-col.ai-col {
+      background: var(--kakao-yellow-soft);
+      border: 1px solid var(--kakao-yellow-border);
+      border-top-right-radius: 6px;
+    }
+    .compare-col h3 {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .compare-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .compare-list li {
+      font-size: 0.89rem;
+      color: var(--text-sub);
+      background: rgba(255, 255, 255, 0.82);
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+    .compare-list li strong {
+      color: var(--text-main);
+    }
+
+    .unverified-box {
+      margin-top: 14px;
+      background: var(--unverified-bg);
+      border: 1px solid var(--unverified-border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 0.87rem;
+      color: #9a3412;
+    }
+
+    /* 독립 실행형 SVG 차트 컨테이너 */
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .svg-chart {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+    .chart-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: #191919;
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+      opacity: 0;
+      transition: opacity 0.12s ease;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .chart-tooltip .tt-date {
+      color: var(--kakao-yellow);
+      font-weight: 700;
+    }
+
+    /* 회사 소개 3단 레이아웃 */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 8px;
+    }
+    .info-box {
+      background: #f8f9fb;
+      border: 1px solid #edf0f4;
+      padding: 18px;
+      border-radius: 16px;
+    }
+    .info-box h4 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--kakao-brown);
+      margin-bottom: 8px;
+      display: inline-block;
+      background: var(--kakao-yellow);
+      padding: 2px 10px;
+      border-radius: 8px;
+    }
+    .info-box p {
+      font-size: 0.88rem;
+      color: var(--text-sub);
+    }
+
+    /* 출처 링크 */
+    .source-link {
+      color: #2563eb;
+      text-decoration: none;
+      font-size: 0.81rem;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+    .source-link:hover {
+      text-decoration: underline;
+    }
+
+    /* 뉴스 카드 */
+    .news-notice {
+      background: #f8f9fb;
+      border: 1px solid #e5e8eb;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+    }
+    .news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .news-card {
+      background: #ffffff;
+      border: 1px solid #e5e8eb;
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .news-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .news-media {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .news-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      text-decoration: none;
+      line-height: 1.45;
+    }
+    .news-title:hover {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+    .news-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .news-box {
+      border-radius: 12px;
+      padding: 11px 13px;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.55;
+    }
+    .news-box.fact-box {
+      background: #f7faff;
+      border: 1px solid #dbeafe;
+    }
+    .news-box.ai-box {
+      background: var(--kakao-yellow-soft);
+      border: 1px solid var(--kakao-yellow-border);
+    }
+
+    /* 체크리스트 */
+    .list-group {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .list-group li {
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #f8f9fb;
+      border: 1px solid #edf0f4;
+      font-size: 0.89rem;
+      color: var(--text-sub);
+    }
+    .list-group li strong {
+      color: var(--text-main);
+    }
+    .list-group li.unverified-item {
+      border-left: 4px solid #f97316;
+    }
+    .list-group li.ai-item {
+      border-left: 4px solid var(--kakao-yellow-border);
+      background: #fffdf5;
+    }
+
+    /* 테이블 스타일 */
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 12px;
+      border-radius: 12px;
+      border: 1px solid #e5e8eb;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: right;
+      background: #ffffff;
+    }
+    th, td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f1f3f5;
+    }
+    th {
+      background: #f8f9fb;
+      color: var(--text-sub);
+      font-weight: 700;
+    }
+    tbody tr:hover {
+      background: #fffdf0;
+    }
+    td:first-child, th:first-child {
+      text-align: left;
+    }
+
+    code {
+      background: #f1f3f5;
+      color: var(--kakao-brown);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 16px 0 8px;
+    }
+
+    /* 모바일 반응형 */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px 12px 28px;
+      }
+      .header-actions {
+        align-items: flex-start;
+      }
+      .compare-grid,
+      .news-split {
+        grid-template-columns: 1fr;
+      }
+      .title-group h1 {
+        font-size: 1.45rem;
+      }
+      .metric-value {
+        font-size: 1.35rem;
+      }
+      .card {
+        padding: 18px;
+        border-radius: 18px;
+      }
+    }
+
+    /* 인쇄 / PDF 저장 전용 스타일 */
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        font-size: 11pt;
+      }
+      .container {
+        max-width: 100% !important;
+        gap: 12px !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .card, .disclaimer-banner {
+        box-shadow: none !important;
+        border: 1px solid #d1d5db !important;
+        padding: 14px 16px !important;
+        border-radius: 12px !important;
+      }
+      .disclaimer-banner,
+      .header-card,
+      .metric-item,
+      .compare-col,
+      .unverified-box,
+      .info-box,
+      .news-card,
+      .list-group li,
+      tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      h2 {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+      }
+      .table-responsive {
+        overflow: visible !important;
+      }
+      table {
+        font-size: 9.5pt !important;
+      }
+      th, td {
+        padding: 6px 8px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 1. 필수 안내 배너 (카카오톡 공지 스타일) -->
+  <div class="disclaimer-banner">
+    <span class="disclaimer-icon">공지</span>
+    <div>
+      이 화면은 <strong>[AI 초안]</strong>이며, 저장된 자료(<strong>2026.10.21 ~ 2026.11.20</strong>)를 바탕으로 만들었습니다. <strong>실시간 주가가 아니며</strong>, 투자 권유가 아닌 공부·참고용 자료입니다.
+    </div>
+  </div>
+
+  <!-- 2. 헤더 -->
+  <div class="card header-card">
+    <div class="title-group">
+      <h1>
+        엔비디아
+        <span class="ticker">NVDA</span>
+      </h1>
+      <div class="sub-meta">
+        <strong>거래소:</strong> 미국 나스닥(NASDAQ) · 
+        <strong>통화:</strong> 미국 달러(USD, $) · 
+        <strong>자료 기준일:</strong> 2026년 11월 20일 마감 · 
+        <strong>출처:</strong> Investing.com 시세 · 공식 IR · 외신 기사
+      </div>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="print-btn no-print" onclick="window.print()">🖨️ 인쇄 / PDF 저장</button>
+      <div class="badges">
+        <span class="badge badge-fact">● [사실] 확인된 숫자·공식 발표</span>
+        <span class="badge badge-ai">★ [AI 해석] 쉬운 풀이</span>
+        <span class="badge badge-unverified">? [미확인] 아직 확정 안 됨</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. [핵심 먼저 보기] 한눈에 보는 1개월 요약 (사실 vs 해석 말풍선 나란히 구성) -->
+  <div class="card">
+    <h2>⚡ 한눈에 보는 핵심 요약 (최근 1개월)</h2>
+    <p class="section-desc">어려운 용어를 빼고 <strong>확인된 사실</strong>과 <strong>AI의 쉬운 풀이</strong>를 나란히 정리했습니다.</p>
+
+    <div class="metrics-grid">
+      <div class="metric-item">
+        <div class="metric-label">최근 종가 (2026.11.20) <span class="badge badge-fact">[사실]</span></div>
+        <div class="metric-value">$125.53</div>
+        <div class="metric-change text-down">전날보다 -14.01% (-$20.45)</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-label">1개월 전 종가 (2026.10.21) <span class="badge badge-fact">[사실]</span></div>
+        <div class="metric-value">$221.97</div>
+        <div class="metric-change" style="color:var(--text-muted)">종가 = 그날 장이 끝날 때 가격</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-label">1개월 동안 변한 폭 <span class="badge badge-fact">[사실]</span></div>
+        <div class="metric-value text-down">-43.45%</div>
+        <div class="metric-change text-down">1주에 -$96.44 하락</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-label">1개월 최고 / 최저 종가 <span class="badge badge-fact">[사실]</span></div>
+        <div class="metric-value" style="font-size: 1.3rem;">$221.97 / $125.53</div>
+        <div class="metric-change" style="color:var(--text-muted)">한 달 사이 가격 변동이 매우 큼</div>
+      </div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-col fact-col">
+        <h3><span class="badge badge-fact">● [사실]</span> 확인된 숫자 · 공식 발표</h3>
+        <ul class="compare-list">
+          <li><strong>주가와 거래량:</strong> 한 달 사이 주가가 $221.97에서 $125.53로 43.45% 내렸습니다. 11월 중순부터 하루 거래량도 3억~7억 주대로 크게 늘었습니다. (출처: 저장 시세 <code>nvda_1month_data.json</code>)</li>
+          <li><strong>CEO 교체 발표:</strong> 2026년 11월 12일 젠슨 황 CEO가 사임했고, 재무 책임자(CFO) 콜렛 크레스가 임시 CEO를 맡았습니다. <a class="source-link" href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-CEO-Transition/" target="_blank" rel="noopener noreferrer">[NVIDIA IR]</a></li>
+          <li><strong>3분기 실적 발표:</strong> 11월 17일 발표한 3분기 매출은 1,158억 달러로 1년 전보다 2배(+103%) 넘게 늘었습니다. <a class="source-link" href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2027/" target="_blank" rel="noopener noreferrer">[NVIDIA IR]</a></li>
+        </ul>
+      </div>
+
+      <div class="compare-col ai-col">
+        <h3><span class="badge badge-ai">★ [AI 해석]</span> 입문자를 위한 쉬운 풀이</h3>
+        <ul class="compare-list">
+          <li><strong>실적은 좋은데 주가는 하락:</strong> 회사가 돈을 잘 벌고 있다는 발표가 나왔지만, 같은 시기에 대표 교체와 조사 보도 같은 불안 요소가 겹치며 투자 심리가 흔들렸을 가능성이 있습니다.</li>
+          <li><strong>단정 금물:</strong> 뉴스가 나온 날과 주가가 내린 날이 겹치더라도, 특정 기사 하나를 하락의 유일한 원인으로 단정하기는 어렵습니다.</li>
+          <li><strong>입문자 참고 포인트:</strong> 아무리 유명한 대형 기술주라도 경영진 변화나 규제 이슈가 생기면 한 달에 40% 넘게 흔들릴 수 있습니다. 한 번에 큰돈을 넣기보다 나눠서 접근하는 습관이 중요합니다.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="unverified-box">
+      <span class="badge badge-unverified">? [미확인 / 확인 필요]</span>
+      <strong>아직 결론이 나지 않은 점:</strong> 미국 증권당국(SEC)의 회계 조사 보도 결과, 정식 후임 CEO가 누가 될지, 그리고 제기된 투자자 집단소송의 결과는 아직 확정되지 않았습니다.
+    </div>
+  </div>
+
+  <!-- 4. 종가 추이 차트 (외부 라이브러리 없이 혼자서도 열리는 벡터 SVG 차트) -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <h2>📈 최근 1개월 종가 추이 차트 <span class="badge badge-fact">[사실]</span></h2>
+      <span style="font-size:0.8rem; color:var(--text-muted);">2026.10.21 ~ 2026.11.20 (23거래일) | 단위: 미국 달러($)</span>
+    </div>
+    <p class="section-desc">인터넷 없이도 단독으로 열리고 인쇄·PDF에서도 선명한 벡터 차트입니다. 점에 마우스를 올리거나 누르면 날짜별 종가를 볼 수 있습니다.</p>
+    <div class="chart-wrapper" id="chartWrapper">
+      <svg id="nvdaSvgChart" class="svg-chart" viewBox="0 0 960 320" role="img" aria-label="엔비디아 최근 1개월 종가 추이 차트"></svg>
+      <div id="chartTooltip" class="chart-tooltip no-print"></div>
+    </div>
+  </div>
+
+  <!-- 5. 초보자를 위한 1분 회사 소개 -->
+  <div class="card">
+    <h2>🏢 초보자를 위한 엔비디아(NVIDIA) 1분 소개</h2>
+    <p class="section-desc">어려운 IT 용어를 일상 말로 쉽게 풀었습니다.</p>
+    <div class="info-grid">
+      <div class="info-box">
+        <h4>💡 무엇을 만드는 회사인가요?</h4>
+        <p>원래 게임용 그래픽카드(GPU)를 만들던 회사입니다. 지금은 AI(인공지능)를 학습시키고 돌리는 데 꼭 필요한 <strong>AI 전용 반도체 칩</strong>과 전용 소프트웨어(CUDA)를 함께 공급하는 세계 대표 기업입니다.</p>
+      </div>
+      <div class="info-box">
+        <h4>📦 대표 제품</h4>
+        <p>• <strong>데이터센터 AI 칩:</strong> 블랙웰(Blackwell), 차세대 베라 루빈(Vera Rubin) <a class="source-link" href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2027/" target="_blank" rel="noopener noreferrer">[NVIDIA IR]</a><br>• <strong>게이밍 그래픽카드:</strong> GeForce RTX 시리즈<br>• <strong>자율주행·로봇용 칩:</strong> NVIDIA DRIVE</p>
+      </div>
+      <div class="info-box">
+        <h4>📌 왜 뉴스에 자주 나오나요?</h4>
+        <p>구글·마이크로소프트 같은 글로벌 빅테크 기업들이 AI 데이터센터에 돈을 얼마나 쓰는지에 따라 엔비디아 매출이 크게 움직이기 때문입니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. 관련 뉴스 섹션 (사실·해석 나란히 보기) -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <h2>📰 관련 뉴스 7건 (사실 · 해석 나란히 보기)</h2>
+      <span style="font-size:0.8rem; color:var(--text-muted);">수집 기준일: 2026.11.21 | 저장 파일: nvda_news_data.json</span>
+    </div>
+    <div class="news-notice">
+      <strong>📌 안내:</strong> 원문에 직접 들어가 본문을 확인한 기사 7건만 실었습니다. 기사 시점과 주가 변동이 겹치더라도 <strong>특정 뉴스가 주가 등락의 직접 원인이라고 단정하지 않습니다.</strong>
+    </div>
+    <div class="news-list" id="newsList">
+      <!-- JS로 동적 생성 -->
+    </div>
+  </div>
+
+  <!-- 7. 투자 전 더 확인할 체크리스트 -->
+  <div class="card">
+    <h2>🔍 앞으로 더 확인해야 할 4가지</h2>
+    <ul class="list-group">
+      <li class="unverified-item">
+        <span class="badge badge-unverified">? [미확인 / 확인 필요]</span>
+        <strong>미국 증권당국(SEC) 회계 조사 결과:</strong> 외신에서 SEC 조사가 보도되었지만, 조사 자체가 잘못이 확정됐다는 뜻은 아닙니다. 최종 결론이 어떻게 나오는지 확인이 필요합니다. <a class="source-link" href="https://www.fool.com/investing/2026/11/20/here-is-why-nvidia-stock-crashed-on-friday/" target="_blank" rel="noopener noreferrer">[The Motley Fool]</a>
+      </li>
+      <li class="unverified-item">
+        <span class="badge badge-unverified">? [미확인 / 확인 필요]</span>
+        <strong>새 정식 CEO 선임:</strong> 이사회가 젠슨 황을 복귀시킬 뜻이 없다고 밝힌 만큼 <a class="source-link" href="https://www.theguardian.com/technology/2026/nov/17/nvidia-third-quarter-revenue-jensen-huang" target="_blank" rel="noopener noreferrer">[The Guardian]</a>, 앞으로 누가 정식 CEO를 맡을지 공식 발표를 지켜봐야 합니다.
+      </li>
+      <li class="unverified-item">
+        <span class="badge badge-unverified">? [미확인 / 확인 필요]</span>
+        <strong>투자자 집단소송 진행 상황:</strong> 2026년 11월 9일 제기된 집단소송은 아직 원고 측 주장 단계입니다. 법원 판단과 회사 대응을 추후 확인해야 합니다. <a class="source-link" href="https://www.morningstar.com/news/pr-newswire/20261120dc03293/nvidia-nasdaq-nvda-investor-alert-investors-who-lost-more-than-1-million-on-shares-purchased-between-october-9-2025-and-november-8-2026-should-contact-the-shareholders-foundation" target="_blank" rel="noopener noreferrer">[Morningstar]</a>
+      </li>
+      <li class="ai-item">
+        <span class="badge badge-ai">★ [AI 해석]</span>
+        <strong>신제품(Vera Rubin) 판매가 계속 잘 되는지:</strong> 회사가 제시한 연간 75% 성장 목표가 다음 분기 실적에서도 이어지는지 확인하는 것이 좋습니다. <a class="source-link" href="https://fortune.com/2026/11/18/nvidia-q3-2027-investigation-jensen-huang-largest-annual-profit/" target="_blank" rel="noopener noreferrer">[Fortune]</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 8. 최근 1개월 일별 상세 데이터 테이블 -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <h2>📊 최근 1개월 일별 시세 표 <span class="badge badge-fact">[사실]</span></h2>
+      <span style="font-size:0.8rem; color:var(--text-muted);">원천 저장 파일: nvda_1month_data.json</span>
+    </div>
+    <p class="section-desc">시가(시작 가격), 고가(가장 높은 가격), 저가(가장 낮은 가격), 종가(마감 가격), 등락률(전날 대비 변동), 거래량(거래된 주식 수)입니다.</p>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>시가 ($)</th>
+            <th>고가 ($)</th>
+            <th>저가 ($)</th>
+            <th>종가 ($)</th>
+            <th>등락률 (%)</th>
+            <th>거래량 (주)</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- JS로 동적 생성 -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 9. 푸터 -->
+  <div class="footer">
+    <p>저장 파일: <code>index.html</code> · 단독 리포트: <code>stock-report.html</code></p>
+    <p style="margin-top:4px;">자료 기준일: 2026-11-20 | 출처: Investing.com 시세 및 각 기사 원문 링크 | 본 화면은 정보 제공용이며 투자 권유가 아닙니다.</p>
+  </div>
+
+</div>
+
+<script>
+  // 저장된 일별 데이터 (기존 유지)
+  const stockData = [
+    {"date": "2026-10-21", "open": 220.96, "high": 222.19, "low": 217.66, "close": 221.97, "volume": 87090000, "change_pct": 2.54},
+    {"date": "2026-10-22", "open": 217.13, "high": 218.88, "low": 211.26, "close": 212.21, "volume": 125410000, "change_pct": -4.40},
+    {"date": "2026-10-23", "open": 210.99, "high": 213.85, "low": 210.18, "close": 210.96, "volume": 80190000, "change_pct": -0.59},
+    {"date": "2026-10-26", "open": 213.10, "high": 217.75, "low": 212.61, "close": 216.00, "volume": 90830000, "change_pct": 2.39},
+    {"date": "2026-10-27", "open": 218.31, "high": 219.19, "low": 215.53, "close": 217.94, "volume": 84800000, "change_pct": 0.90},
+    {"date": "2026-10-28", "open": 219.91, "high": 219.99, "low": 214.47, "close": 215.38, "volume": 93030000, "change_pct": -1.17},
+    {"date": "2026-10-29", "open": 214.36, "high": 215.33, "low": 212.08, "close": 213.66, "volume": 77570000, "change_pct": -0.80},
+    {"date": "2026-10-30", "open": 208.94, "high": 209.06, "low": 200.92, "close": 204.64, "volume": 168390000, "change_pct": -4.22},
+    {"date": "2026-11-02", "open": 207.53, "high": 209.98, "low": 201.66, "close": 202.06, "volume": 119270000, "change_pct": -1.26},
+    {"date": "2026-11-03", "open": 207.96, "high": 209.14, "low": 205.93, "close": 206.69, "volume": 91940000, "change_pct": 2.29},
+    {"date": "2026-11-04", "open": 203.50, "high": 206.79, "low": 199.68, "close": 200.13, "volume": 149030000, "change_pct": -3.17},
+    {"date": "2026-11-05", "open": 196.07, "high": 196.25, "low": 181.46, "close": 181.60, "volume": 306130000, "change_pct": -9.26},
+    {"date": "2026-11-06", "open": 191.10, "high": 194.90, "low": 185.22, "close": 186.64, "volume": 180210000, "change_pct": 2.78},
+    {"date": "2026-11-09", "open": 173.07, "high": 179.92, "low": 170.24, "close": 178.67, "volume": 462720000, "change_pct": -4.27},
+    {"date": "2026-11-10", "open": 173.97, "high": 174.69, "low": 165.89, "close": 168.89, "volume": 429270000, "change_pct": -5.47},
+    {"date": "2026-11-11", "open": 172.80, "high": 177.54, "low": 170.77, "close": 173.73, "volume": 339210000, "change_pct": 2.87},
+    {"date": "2026-11-12", "open": 151.01, "high": 167.14, "low": 148.80, "close": 166.19, "volume": 747710000, "change_pct": -4.34},
+    {"date": "2026-11-13", "open": 169.90, "high": 170.00, "low": 158.39, "close": 162.85, "volume": 365800000, "change_pct": -2.01},
+    {"date": "2026-11-16", "open": 159.01, "high": 163.20, "low": 155.01, "close": 156.14, "volume": 333820000, "change_pct": -4.12},
+    {"date": "2026-11-17", "open": 156.90, "high": 158.19, "low": 150.33, "close": 155.46, "volume": 406990000, "change_pct": -0.44},
+    {"date": "2026-11-18", "open": 159.19, "high": 159.70, "low": 150.40, "close": 150.96, "volume": 349790000, "change_pct": -2.89},
+    {"date": "2026-11-19", "open": 152.92, "high": 158.13, "low": 145.71, "close": 145.98, "volume": 322940000, "change_pct": -3.30},
+    {"date": "2026-11-20", "open": 143.52, "high": 143.72, "low": 124.58, "close": 125.53, "volume": 602000000, "change_pct": -14.01}
+  ];
+
+  // 본문 확인 완료된 관련 뉴스 7건 (기존 유지)
+  const newsData = [
+    {
+      date: "2026-11-20",
+      media: "The Motley Fool",
+      title: "Here's Why Nvidia Stock Crashed on Friday",
+      url: "https://www.fool.com/investing/2026/11/20/here-is-why-nvidia-stock-crashed-on-friday/",
+      status: "본문 확인 완료",
+      summaryFact: "미국 증권당국(SEC)이 엔비디아의 회계 처리 방식을 조사 중이라는 로이터 보도가 나왔습니다. 로이터는 '조사가 곧 잘못의 증거는 아니며, 처벌 없이 끝나는 경우도 많다'고 덧붙였습니다.",
+      summaryNote: "기사는 11월 20일 주가 급락과 조사 보도를 함께 다뤘지만, 이 보도 하나를 하락의 유일한 원인으로 단정하지는 않습니다."
+    },
+    {
+      date: "2026-11-20",
+      media: "Morningstar (PR Newswire)",
+      title: "NVIDIA (NASDAQ: NVDA) INVESTOR ALERT: Investors Who Lost More Than $1 Million on Shares Purchased Between October 9, 2025 and November 8, 2026 Should Contact the Shareholders Foundation",
+      url: "https://www.morningstar.com/news/pr-newswire/20261120dc03293/nvidia-nasdaq-nvda-investor-alert-investors-who-lost-more-than-1-million-on-shares-purchased-between-october-9-2025-and-november-8-2026-should-contact-the-shareholders-foundation",
+      status: "본문 확인 완료",
+      summaryFact: "2026년 11월 9일 미국 법원에 엔비디아를 상대로 한 투자자 집단소송이 제기되었습니다. 대표 원고 신청 마감일은 2027년 1월 8일입니다.",
+      summaryNote: "집단소송은 투자자 측이 문제를 제기한 단계일 뿐, 법원이 회사의 잘못을 인정한 확정 사실은 아닙니다."
+    },
+    {
+      date: "2026-11-18",
+      media: "Fortune",
+      title: "Nvidia Q3 shuts door on Huang’s return as company nears largest annual profit in history",
+      url: "https://fortune.com/2026/11/18/nvidia-q3-2027-investigation-jensen-huang-largest-annual-profit/",
+      status: "본문 확인 완료",
+      summaryFact: "임시 CEO 콜렛 크레스는 올해 매출 성장률 목표를 기존 약 70%에서 75%로 높였습니다. 3분기 순이익은 653억 달러, 올해 누적 순이익은 1,833억 달러입니다.",
+      summaryNote: "연간 사상 최대 이익을 실제로 달성할지는 올해 결산이 끝나야 최종 확정됩니다."
+    },
+    {
+      date: "2026-11-17",
+      media: "NVIDIA IR (공식 보도자료)",
+      title: "NVIDIA Announces Financial Results for Third Quarter Fiscal 2027",
+      url: "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2027/",
+      status: "본문 확인 완료",
+      summaryFact: "3분기(2026.10.25 마감) 매출은 1,158억 달러로 1년 전보다 103% 늘었고, 이익률(매출총이익률)은 약 75%를 기록했습니다. 자사주 매입과 배당으로 281억 달러를 주주에게 돌려줬습니다.",
+      summaryNote: "임시 CEO는 새 제품인 '베라 루빈(Vera Rubin)'이 매우 빠르게 팔리기 시작했다고 밝혔습니다."
+    },
+    {
+      date: "2026-11-17",
+      media: "The Guardian",
+      title: "Nvidia doubles revenue as board says it does not intend to reinstate Jensen Huang",
+      url: "https://www.theguardian.com/technology/2026/nov/17/nvidia-third-quarter-revenue-jensen-huang",
+      status: "본문 확인 완료",
+      summaryFact: "하비 존스 이사회 의장은 3분기 실적 발표에서 '젠슨 황을 다시 CEO로 복귀시킬 생각이 없다'고 말했습니다. 같은 날 3분기 매출은 1년 전의 2배로 발표되었습니다.",
+      summaryNote: "좋은 실적 소식과 전 CEO 복귀 불가 발언이 같은 날 함께 전해졌습니다."
+    },
+    {
+      date: "2026-11-12",
+      media: "NVIDIA IR (공식 보도자료)",
+      title: "NVIDIA Announces CEO Transition",
+      url: "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-CEO-Transition/",
+      status: "본문 확인 완료",
+      summaryFact: "젠슨 황이 사장·CEO·이사 자리에서 즉시 물러났습니다. 재무 책임자(CFO) 콜렛 크레스가 임시 CEO를 맡고, 하비 C. 존스가 첫 독립 이사회 의장이 되었습니다.",
+      summaryNote: "정식 후임 CEO를 언제, 누구로 뽑을지는 아직 발표되지 않았습니다."
+    },
+    {
+      date: "2026-11-12",
+      media: "The Guardian",
+      title: "Nvidia turmoil continues as Jensen Huang resigns over affairs scandal and company appoints interim CEO – as it happened",
+      url: "https://www.theguardian.com/technology/live/2026/nov/12/nvidia-ceo-jensen-huang-affairs-share-price-plunges-live-latest",
+      status: "본문 확인 완료",
+      summaryFact: "젠슨 황 전 CEO가 사임한 당일의 실시간 속보로, 사생활 스캔들 및 중국 관련 의혹 보도와 임시 CEO 선임 과정을 정리했습니다.",
+      summaryNote: "언론에서 제기한 의혹의 정확한 사실관계와 조사 결과는 아직 공식 확정 전입니다."
+    }
+  ];
+
+  // 1. 독립 실행형 SVG 차트 렌더링 (오프라인·인쇄·PDF 완벽 호환)
+  (function renderSvgChart() {
+    const svg = document.getElementById('nvdaSvgChart');
+    const tooltip = document.getElementById('chartTooltip');
+    const wrapper = document.getElementById('chartWrapper');
+    const W = 960, H = 320;
+    const pad = { top: 24, right: 28, bottom: 42, left: 58 };
+    const plotW = W - pad.left - pad.right;
+    const plotH = H - pad.top - pad.bottom;
+
+    const minY = 120, maxY = 240;
+    const xPos = i => pad.left + (i / (stockData.length - 1)) * plotW;
+    const yPos = v => pad.top + ((maxY - v) / (maxY - minY)) * plotH;
+
+    let svgHtml = `
+      <defs>
+        <linearGradient id="kakaoAreaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fee500" stop-opacity="0.42"/>
+          <stop offset="100%" stop-color="#fee500" stop-opacity="0.03"/>
+        </linearGradient>
+      </defs>
+    `;
+
+    // Y축 눈금선 ($120 ~ $240, 20단위)
+    for (let yVal = minY; yVal <= maxY; yVal += 20) {
+      const y = yPos(yVal);
+      svgHtml += `<line x1="${pad.left}" y1="${y}" x2="${W - pad.right}" y2="${y}" stroke="#e5e8eb" stroke-width="1"/>`;
+      svgHtml += `<text x="${pad.left - 10}" y="${y + 4}" text-anchor="end" font-size="12" fill="#8b95a1">$${yVal}</text>`;
+    }
+
+    // X축 날짜 라벨 (일부 간격으로 표시)
+    stockData.forEach((d, i) => {
+      if (i === 0 || i === stockData.length - 1 || i % 3 === 0) {
+        const x = xPos(i);
+        svgHtml += `<text x="${x}" y="${H - 14}" text-anchor="middle" font-size="11.5" fill="#8b95a1">${d.date.slice(5)}</text>`;
+      }
+    });
+
+    // 영역 채우기 및 꺾은선 경로
+    const points = stockData.map((d, i) => `${xPos(i).toFixed(1)},${yPos(d.close).toFixed(1)}`);
+    const areaPath = `M ${xPos(0).toFixed(1)},${yPos(minY).toFixed(1)} L ${points.join(' L ')} L ${xPos(stockData.length - 1).toFixed(1)},${yPos(minY).toFixed(1)} Z`;
+    const linePath = `M ${points.join(' L ')}`;
+
+    svgHtml += `<path d="${areaPath}" fill="url(#kakaoAreaGrad)"/>`;
+    svgHtml += `<path d="${linePath}" fill="none" stroke="#3c1e1e" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+
+    // 데이터 포인트
+    stockData.forEach((d, i) => {
+      const cx = xPos(i).toFixed(1);
+      const cy = yPos(d.close).toFixed(1);
+      svgHtml += `<circle class="chart-dot" data-idx="${i}" cx="${cx}" cy="${cy}" r="5" fill="#fee500" stroke="#3c1e1e" stroke-width="2" style="cursor:pointer;"/>`;
+    });
+
+    // 시작점·끝점 가격 라벨 (인쇄/PDF에서도 한눈에 보이도록)
+    const first = stockData[0];
+    const last = stockData[stockData.length - 1];
+    svgHtml += `<text x="${xPos(0) + 6}" y="${yPos(first.close) - 10}" font-size="12" font-weight="700" fill="#3c1e1e">$${first.close.toFixed(2)}</text>`;
+    svgHtml += `<text x="${xPos(stockData.length - 1) - 6}" y="${yPos(last.close) - 12}" text-anchor="end" font-size="12" font-weight="800" fill="#e11d48">$${last.close.toFixed(2)}</text>`;
+
+    svg.innerHTML = svgHtml;
+
+    // 툴팁 인터랙션
+    svg.querySelectorAll('.chart-dot').forEach(dot => {
+      const showTip = (e) => {
+        const idx = Number(dot.getAttribute('data-idx'));
+        const item = stockData[idx];
+        const sign = item.change_pct > 0 ? '+' : '';
+        tooltip.innerHTML = `<div class="tt-date">${item.date}</div><div>종가: <strong>$${item.close.toFixed(2)}</strong> (${sign}${item.change_pct.toFixed(2)}%)</div>`;
+        const rect = wrapper.getBoundingClientRect();
+        const dotRect = dot.getBoundingClientRect();
+        let left = dotRect.left - rect.left + 10;
+        if (left + 170 > rect.width) left = dotRect.left - rect.left - 175;
+        tooltip.style.left = Math.max(4, left) + 'px';
+        tooltip.style.top = Math.max(4, dotRect.top - rect.top - 48) + 'px';
+        tooltip.style.opacity = '1';
+      };
+      dot.addEventListener('mouseenter', showTip);
+      dot.addEventListener('click', showTip);
+      dot.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
+    });
+  })();
+
+  // 2. 관련 뉴스 렌더링
+  const newsListEl = document.getElementById('newsList');
+  newsData.forEach(item => {
+    const card = document.createElement('article');
+    card.className = 'news-card';
+    card.innerHTML = `
+      <div class="news-meta">
+        <span>${item.date}</span>
+        <span>·</span>
+        <span class="news-media">${item.media}</span>
+        <span class="badge badge-read">✓ ${item.status}</span>
+        <a class="source-link" href="${item.url}" target="_blank" rel="noopener noreferrer">[원문 보기 ↗]</a>
+      </div>
+      <a class="news-title" href="${item.url}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+      <div class="news-split">
+        <div class="news-box fact-box">
+          <span class="badge badge-fact">[사실]</span> ${item.summaryFact}
+        </div>
+        <div class="news-box ai-box">
+          <span class="badge badge-ai">[AI 해석/유의]</span> ${item.summaryNote}
+        </div>
+      </div>
+    `;
+    newsListEl.appendChild(card);
+  });
+
+  // 3. 테이블 렌더링 (최신 날짜가 위에 오도록 역순 출력)
+  const tbody = document.getElementById('tableBody');
+  const reversedData = [...stockData].reverse();
+
+  reversedData.forEach(row => {
+    const tr = document.createElement('tr');
+    const changeClass = row.change_pct > 0 ? 'text-up' : (row.change_pct < 0 ? 'text-down' : '');
+    const sign = row.change_pct > 0 ? '+' : '';
+    const formattedVol = (row.volume / 1000000).toFixed(1) + 'M';
+
+    tr.innerHTML = `
+      <td><strong>${row.date}</strong></td>
+      <td>$${row.open.toFixed(2)}</td>
+      <td>$${row.high.toFixed(2)}</td>
+      <td>$${row.low.toFixed(2)}</td>
+      <td><strong>$${row.close.toFixed(2)}</strong></td>
+      <td class="${changeClass}">${sign}${row.change_pct.toFixed(2)}%</td>
+      <td>${formattedVol}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+# 비밀정보 및 환경 변수
+.env
+.env.*
+*.key
+*.pem
+*secret*
+*token*
+*credential*
+
+# OS 및 에디터 임시 파일
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+*.bak
+.vscode/
+.idea/
+
+# 개인 자료 및 로컬 백업
+private/
+personal/
+backup/
+*.pdf
